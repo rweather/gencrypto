@@ -1,0 +1,25 @@
+%%if(ascon-suite):#include "ascon-masked-backend.h"
+%%if(ascon-suite):#if defined(ASCON_MASKED_X2_BACKEND_AVR5)
+%%COPYRIGHT
+
+#include <avr/io.h>
+
+#if defined(ASCON_MASKED_MAX_SHARES) && ASCON_MASKED_MAX_SHARES < 3
+
+	.text
+.global ascon_x2_permute
+	.type ascon_x2_permute, @function
+%%function-body:ascon_x2_permute:2shares:avr5
+	.size ascon_x2_permute, .-ascon_x2_permute
+
+#else
+
+	.text
+.global ascon_x2_permute
+	.type ascon_x2_permute, @function
+%%function-body:ascon_x2_permute:3shares:avr5
+	.size ascon_x2_permute, .-ascon_x2_permute
+
+#endif
+
+%%if(ascon-suite):#endif

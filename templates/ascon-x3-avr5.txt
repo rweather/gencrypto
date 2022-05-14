@@ -1,0 +1,14 @@
+%%if(ascon-suite):#include "ascon-masked-backend.h"
+%%if(ascon-suite):#if defined(ASCON_MASKED_X3_BACKEND_AVR5) && ASCON_MASKED_MAX_SHARES == 3
+%%COPYRIGHT
+
+#include <avr/io.h>
+
+	.text
+.global ascon_x3_permute
+	.type ascon_x3_permute, @function
+ascon_x3_permute:
+%%function-body:ascon_x3_permute:3shares:avr5
+	.size ascon_x3_permute, .-ascon_x3_permute
+
+%%if(ascon-suite):#endif
