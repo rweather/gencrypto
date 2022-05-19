@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Southern Storm Software, Pty Ltd.
+ * Copyright (C) 2022 Southern Storm Software, Pty Ltd.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -20,7 +20,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include "ascon-avr5.h"
+#include "avr/code.h"
+#include "common/registry.h"
 #include <cstring>
 
 using namespace AVR;
@@ -109,7 +110,7 @@ static void ascon_diffuse
     code.releaseReg(t);
 }
 
-void gen_ascon_permutation(Code &code)
+static void gen_avr_ascon_permutation(Code &code)
 {
     // Set up the function prologue with 0 bytes of local variable storage.
     // Z points to the permutation state on input and output.
@@ -162,7 +163,7 @@ void gen_ascon_permutation(Code &code)
     code.stz(x4.reversed(), ASCON_WORD(4));
 }
 
-void gen_ascon_cleanup(Code &code)
+static void gen_avr_ascon_cleanup(Code &code)
 {
     // Set up the function prologue with 0 bytes of local variable storage.
     // Z points to the permutation state on input and output.
@@ -184,35 +185,21 @@ void gen_ascon_cleanup(Code &code)
     code.move(r0, 0);
 }
 
-bool test_ascon_permutation(Code &code)
+static bool test_avr_ascon_permutation
+    (Code &code, const gencrypto::TestVector &vec)
 {
-    static unsigned char const input[40] = {
-        0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-        0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-        0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-        0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
-        0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27
-    };
-    static unsigned char const output_12[40] = {
-        0x06, 0x05, 0x87, 0xe2, 0xd4, 0x89, 0xdd, 0x43,
-        0x1c, 0xc2, 0xb1, 0x7b, 0x0e, 0x3c, 0x17, 0x64,
-        0x95, 0x73, 0x42, 0x53, 0x18, 0x44, 0xa6, 0x74,
-        0x96, 0xb1, 0x71, 0x75, 0xb4, 0xcb, 0x68, 0x63,
-        0x29, 0xb5, 0x12, 0xd6, 0x27, 0xd9, 0x06, 0xe5
-    };
-    static unsigned char const output_8[40] = {
-        0x83, 0x0d, 0x26, 0x0d, 0x33, 0x5f, 0x3b, 0xed,
-        0xda, 0x0b, 0xba, 0x91, 0x7b, 0xcf, 0xca, 0xd7,
-        0xdd, 0x0d, 0x88, 0xe7, 0xdc, 0xb5, 0xec, 0xd0,
-        0x89, 0x2a, 0x02, 0x15, 0x1f, 0x95, 0x94, 0x6e,
-        0x3a, 0x69, 0xcb, 0x3c, 0xf9, 0x82, 0xf6, 0xf7
-    };
+    int firstRound = vec.valueAsInt("First_Round", 0);
     unsigned char state[40];
-    int ok;
-    memcpy(state, input, 40);
-    code.exec_permutation(state, 40, 0);
-    ok = !memcmp(output_12, state, 40);
-    memcpy(state, input, 40);
-    code.exec_permutation(state, 40, 4);
-    return ok && !memcmp(output_8, state, 40);
+    if (firstRound < 0 || firstRound > 12)
+        return false;
+    if (!vec.populate(state, sizeof(state), "Input"))
+        return false;
+    code.exec_permutation(state, 40, firstRound);
+    return vec.check(state, sizeof(state), "Output");
 }
+
+GENCRYPTO_REGISTER_AVR("ascon_permute", 0, "avr5",
+                       gen_avr_ascon_permutation,
+                       test_avr_ascon_permutation);
+GENCRYPTO_REGISTER_AVR("ascon_backend_free", 0, "avr5",
+                       gen_avr_ascon_cleanup, 0);

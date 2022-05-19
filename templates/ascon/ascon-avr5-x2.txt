@@ -1,0 +1,55 @@
+%%if(ascon-suite):#include "ascon-masked-backend.h"
+%%if(ascon-suite):#if defined(ASCON_MASKED_X2_BACKEND_AVR5)
+%%copyright
+
+#include <avr/io.h>
+
+#if defined(ASCON_MASKED_MAX_SHARES) && ASCON_MASKED_MAX_SHARES < 3
+
+/*
+ * typedef union {
+ *   uint64_t S[2]; // 64-bit words of the two shares.
+ *   uint32_t W[4]; // 32-bit words of the two shares.
+ *   uint8_t B[16]; // Bytes of the two shares.
+ * } masked_word_t;
+ *
+ * typedef struct {
+ *    masked_word_t M[5]; // Masked words of the state.
+ * } ascon_masked_state_t;
+ *
+ * void ascon_x2_permute
+ *     (ascon_masked_state_t *state, uint8_t first_round, uint64_t preserve[1]);
+ */
+	.text
+.global ascon_x2_permute
+	.type ascon_x2_permute, @function
+ascon_x2_permute:
+%%function-body:ascon_x2_permute:2shares:avr5
+	.size ascon_x2_permute, .-ascon_x2_permute
+
+#else
+
+/*
+ * typedef union {
+ *   uint64_t S[3]; // 64-bit words of the three shares (third is ignored).
+ *   uint32_t W[6]; // 32-bit words of the three shares.
+ *   uint8_t B[24]; // Bytes of the three shares.
+ * } masked_word_t;
+ *
+ * typedef struct {
+ *    masked_word_t M[5]; // Masked words of the state.
+ * } ascon_masked_state_t;
+ *
+ * void ascon_x2_permute
+ *     (ascon_masked_state_t *state, uint8_t first_round, uint64_t preserve[1]);
+ */
+	.text
+.global ascon_x2_permute
+	.type ascon_x2_permute, @function
+ascon_x2_permute:
+%%function-body:ascon_x2_permute:3shares:avr5
+	.size ascon_x2_permute, .-ascon_x2_permute
+
+#endif
+
+%%if(ascon-suite):#endif

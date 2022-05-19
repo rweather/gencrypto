@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Southern Storm Software, Pty Ltd.
+ * Copyright (C) 2022 Southern Storm Software, Pty Ltd.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -400,11 +400,11 @@ void Code::write(std::ostream &ostream) const
     unsigned saved = 0x0003FFFC;
 
     // Output the function header.
-    ostream << std::endl;
-    ostream << "\t.text" << std::endl;
-    ostream << ".global " << m_name << std::endl;
-    ostream << "\t.type " << m_name << ", @function" << std::endl;
-    ostream << m_name << ":" << std::endl;
+    //ostream << std::endl;
+    //ostream << "\t.text" << std::endl;
+    //ostream << ".global " << m_name << std::endl;
+    //ostream << "\t.type " << m_name << ", @function" << std::endl;
+    //ostream << m_name << ":" << std::endl;
 
     // Push registers that we need to save on the stack.
     unsigned saved_regs = 2;
@@ -603,8 +603,8 @@ void Code::write(std::ostream &ostream) const
     ostream << "\tret" << std::endl;
 
     // Output the function footer.
-    ostream << "\t.size " << m_name;
-    ostream << ", .-" << m_name << std::endl;
+    //ostream << "\t.size " << m_name;
+    //ostream << ", .-" << m_name << std::endl;
 }
 
 void Code::sbox_write

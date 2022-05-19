@@ -44,6 +44,6 @@ static char const copyright_message[] =
 " * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING\n"
 " * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER\n"
 " * DEALINGS IN THE SOFTWARE.\n"
-" */\n\n";
+" */\n";
 
 #endif

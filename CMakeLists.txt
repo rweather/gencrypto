@@ -7,11 +7,7 @@ include(CheckLibraryExists)
 project(gencrypto VERSION 0.1.0 LANGUAGES C CXX)
 
 if(NOT CMAKE_BUILD_TYPE)
-    if(COVERAGE)
-        set(CMAKE_BUILD_TYPE Debug)
-    else()
-        set(CMAKE_BUILD_TYPE Release)
-    endif()
+    set(CMAKE_BUILD_TYPE Debug)
 endif()
 set(CMAKE_C_FLAGS "-Wall -Wextra -DHAVE_CONFIG_H ${CMAKE_C_FLAGS}")
 set(CMAKE_C_FLAGS_DEBUG "-g")
@@ -36,6 +32,7 @@ include_directories(src)
 
 # Add the subdirectories.
 add_subdirectory(src)
+add_subdirectory(test)
 
 # Enable testing support.
 enable_testing()

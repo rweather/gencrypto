@@ -20,22 +20,36 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef ASCON_AVR5_H
-#define ASCON_AVR5_H
+#ifndef GENCRYPTO_CODEGEN_H
+#define GENCRYPTO_CODEGEN_H
 
-#include "avr/code.h"
+#include <string>
+#include <ostream>
+#include <vector>
+#include <map>
 
-// ASCON permutation.
-void gen_ascon_permutation(AVR::Code &code);
-void gen_ascon_cleanup(AVR::Code &code);
-bool test_ascon_permutation(AVR::Code &code);
+class gencrypto
+{
 
-// 2-share version of the ASCON permutation.
-void gen_ascon_x2_permutation(AVR::Code &code, int max_shares);
-bool test_ascon_x2_permutation(AVR::Code &code, int max_shares);
+/**
+ * \brief Code generator API.
+ *
+ * Subclasses implement code generation policies for different platforms.
+ */
+class CodeGenerator
+{
+public:
+    /**
+     * \brief Construct a new code generator.
+     */
+    CodeGenerator() {}
 
-// 3-share version of the ASCON permutation.
-void gen_ascon_x3_permutation(AVR::Code &code);
-bool test_ascon_x3_permutation(AVR::Code &code);
+    /**
+     * \brief Destroys this code generator.
+     */
+    virtual ~CodeGenerator();
+};
+
+} // namespace gencrypto
 
 #endif

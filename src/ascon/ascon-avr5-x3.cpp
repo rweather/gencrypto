@@ -20,7 +20,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include "ascon-avr5.h"
+#include "avr/code.h"
+#include "common/registry.h"
 #include <cstring>
 #include <cstdlib>
 #include <ctime>
@@ -290,7 +291,7 @@ static void ascon_diffuse
     code.releaseReg(t);
 }
 
-void gen_ascon_x3_permutation(Code &code)
+static void gen_avr_ascon_x3_permutation(Code &code)
 {
     int index;
 
@@ -525,43 +526,26 @@ static void unmask(unsigned char out[40], const unsigned char in[120])
     }
 }
 
-bool test_ascon_x3_permutation(Code &code)
+static bool test_avr_ascon_x3_permutation
+    (Code &code, const gencrypto::TestVector &vec)
 {
-    static unsigned char const input[40] = {
-        0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-        0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-        0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-        0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
-        0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27
-    };
-    static unsigned char const output_12[40] = {
-        0x06, 0x05, 0x87, 0xe2, 0xd4, 0x89, 0xdd, 0x43,
-        0x1c, 0xc2, 0xb1, 0x7b, 0x0e, 0x3c, 0x17, 0x64,
-        0x95, 0x73, 0x42, 0x53, 0x18, 0x44, 0xa6, 0x74,
-        0x96, 0xb1, 0x71, 0x75, 0xb4, 0xcb, 0x68, 0x63,
-        0x29, 0xb5, 0x12, 0xd6, 0x27, 0xd9, 0x06, 0xe5
-    };
-    static unsigned char const output_8[40] = {
-        0x83, 0x0d, 0x26, 0x0d, 0x33, 0x5f, 0x3b, 0xed,
-        0xda, 0x0b, 0xba, 0x91, 0x7b, 0xcf, 0xca, 0xd7,
-        0xdd, 0x0d, 0x88, 0xe7, 0xdc, 0xb5, 0xec, 0xd0,
-        0x89, 0x2a, 0x02, 0x15, 0x1f, 0x95, 0x94, 0x6e,
-        0x3a, 0x69, 0xcb, 0x3c, 0xf9, 0x82, 0xf6, 0xf7
-    };
-    unsigned char state[120];
-    unsigned char result[40];
+    int firstRound = vec.valueAsInt("First_Round", 0);
+    unsigned char input[40];
+    unsigned char output[40];
     unsigned char preserve[16];
-    int ok;
+    unsigned char state[120];
+    if (firstRound < 0 || firstRound > 12)
+        return false;
+    if (!vec.populate(input, sizeof(input), "Input"))
+        return false;
     mask(state, input);
     be_store_word64(preserve, get_random());
     be_store_word64(preserve + 8, get_random());
-    code.exec_masked_permutation(state, 120, 0, preserve, 16);
-    unmask(result, state);
-    ok = !memcmp(output_12, result, 40);
-    mask(state, input);
-    be_store_word64(preserve, get_random());
-    be_store_word64(preserve + 8, get_random());
-    code.exec_masked_permutation(state, 120, 4, preserve, 16);
-    unmask(result, state);
-    return ok && !memcmp(output_8, result, 40);
+    code.exec_masked_permutation(state, 120, firstRound, preserve, 8);
+    unmask(output, state);
+    return vec.check(output, sizeof(output), "Output");
 }
+
+GENCRYPTO_REGISTER_AVR("ascon_x3_permute", 0, "avr5",
+                       gen_avr_ascon_x3_permutation,
+                       test_avr_ascon_x3_permutation);

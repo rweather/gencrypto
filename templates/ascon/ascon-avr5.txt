@@ -1,19 +1,28 @@
 %%if(ascon-suite):#include "ascon-select-backend.h"
 %%if(ascon-suite):#if defined(ASCON_BACKEND_AVR5)
 %%if(lwc-finalists):#if defined(__AVR__)
-%%COPYRIGHT
+%%copyright
 
 #include <avr/io.h>
 
+/*
+ * typedef struct {
+ *   uint8_t b[40]; // Bytes of the state in big-endian order.
+ * } ascon_state_t;
+ *
+ * void ascon_permute(ascon_state_t *state, uint8_t first_round);
+ */
 	.text
 .global ascon_permute
 	.type ascon_permute, @function
+ascon_permute:
 %%function-body:ascon_permute:avr5
 	.size ascon_permute, .-ascon_permute
 
 %%if(ascon-suite):	.text
 %%if(ascon-suite):.global ascon_backend_free
 %%if(ascon-suite):	.type ascon_backend_free, @function
+%%if(ascon-suite):ascon_backend_free:
 %%if(ascon-suite):%%function-body:ascon_backend_free:avr5
 %%if(ascon-suite):	.size ascon_backend_free, .-ascon_backend_free
 
