@@ -1,9 +1,65 @@
 gencrypto
 =========
 
-The "gencrypto" repository provides a framework for generating and
-testing high performance assembly code versions of cryptography
-primitives.  For reasons why this exists, see the "History" section below.
+The "gencrypto" tool is a "guided compiler" that provides a framework
+for generating and testing high performance assembly code versions of
+cryptography primitives.
+
+For reasons why this exists, see the "History" section below.
+
+The framework provides API's to generate machine instructions on the
+target machine, while taking care of the mundane tasks of register
+allocation, stack frame management, parameter passing, and assembly
+code output.
+
+High-level functions allow operation on multi-word quantities in a
+declarative manner.  For example, rotating the contents of a 64-bit
+value right by 17 bits is done as follows:
+
+    code.ror(reg, 17);
+
+Rotating a 64-bit word and XOR'ing it with another word to produce a
+result in a destination; that is, dest = src1 ^ (src2 >>> 17):
+
+    code.ror_xor(dest, src1, src2, 17);
+
+This works on any target machine, regardless of whether the value
+is made up of one 64-bit register or two 32-bit registers.
+The framework figures out how to convert such high-level operations
+into the best instruction sequence on the target.
+
+Sometimes algorithms need special handling for 32-bit vs 64-bit
+platforms.  For example, ASCON uses a bit-sliced representation on
+32-bit platforms to make rotations more efficient.  Some platforms
+only support 2-address instructions (source and destination), whereas
+others support 3-address instructions (two sources, one destination).
+
+The user can guide the compiler to generate better code by checking
+the target's capabilities and adjusting the instructions accordingly:
+
+    if (code.target(Target::Word32)) {
+        // code for 32-bit platforms
+        // ...
+    } else {
+        // code for 64-bit platforms
+        // ...
+    }
+
+    if (code.target(Target::RotateAndOperate)) {
+        // code for platforms with 3-address "rotate and operate" instructions
+        // ...
+    } else if (code.target(Target::ThreeAddress)) {
+        // code for platforms with 3-address instructions, but no support
+        // for "rotate and operate" instructions.
+        // ...
+    } else {
+        // code for platforms with only 2-address instructions
+        // ...
+    }
+
+The "gencrypto" tool includes an interpreter for the target, which allows
+Known Answer Tests (KAT's) to be run on the algorithms before the code is
+transferred to the target.  This can accelerate development considerably.
 
 Building and Using
 ------------------
@@ -27,8 +83,8 @@ directory provide the outer shell of each implementation.  Make a
 new template by copying an existing one and then run the "gencrypto"
 program as follows:
 
-    build/src/gencrypto -t templates/my-ascon-avr5.txt test/vectors/ascon.txt
-    build/src/gencrypto -o my-ascon-avr5.S templates/my-ascon-avr5.txt
+    build/src/gencrypto -t templates/my-ascon-armv6m.txt test/vectors/ascon.txt
+    build/src/gencrypto -o my-ascon-armv6m.S templates/my-ascon-armv6m.txt
 
 The first command runs correctness tests on the code to verify its
 functionality using gencrypto's built-in interpreter.  The second command
@@ -37,7 +93,7 @@ generates the assembly code output.
 The templates may contain lines that are included conditionally, prefixed
 with "%%if".  Conditional defines are be passed on the command-line as follows:
 
-    build/src/gencrypto -Dcondition -o my-ascon-avr5.S templates/my-ascon-avr5.txt
+    build/src/gencrypto -Dcondition -o my-ascon-armv6m.S templates/my-ascon-armv6m.txt
 
 History
 -------

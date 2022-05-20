@@ -594,6 +594,8 @@ public:
     void sbox_lookup(const Reg &reg1, const Reg &reg2);
     void sbox_write(std::ostream &ostream, unsigned char num, const Sbox &sbox);
     Sbox sbox_get(unsigned char num) const { return m_sboxes.at(num); }
+    unsigned sbox_count() { return m_sboxes.size(); }
+    void sbox_add(unsigned char num, const Sbox &sbox) { m_sboxes[num] = sbox; }
 
     // Function prologue management.
     void prologue_setup_key(const char *name, unsigned size_locals);

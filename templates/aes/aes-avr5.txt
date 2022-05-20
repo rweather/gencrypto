@@ -1,0 +1,61 @@
+%%if(lwc-finalists):#if defined(__AVR__)
+%%copyright
+
+#include <avr/io.h>
+
+/*
+ * typedef struct {
+ *   uint16_t rounds; // Number of rounds: 10, 12, or 14.
+ *   uint16_t bytes;  // Number of bytes in the key schedule.
+ *   uint32_t k[60];  // Round keys, can be shortened for AES-128 and AES-192.
+ * } aes_key_schedule_t;
+ *
+ * void aes_128_init(aes_key_schedule_t *ks, const unsigned char key[16]);
+ * void aes_192_init(aes_key_schedule_t *ks, const unsigned char key[24]);
+ * void aes_256_init(aes_key_schedule_t *ks, const unsigned char key[32]);
+ * void aes_ecb_encrypt
+ *     (const aes_key_schedule_t *ks, unsigned char ciphertext[16],
+ *      const unsigned char plaintext[16]);
+ * void aes_ecb_decrypt
+ *     (const aes_key_schedule_t *ks, unsigned char plaintext[16],
+ *      const unsigned char ciphertext[16]);
+ */
+
+	.text
+.global aes_128_init
+	.type aes_128_init, @function
+aes_128_init:
+%%function-body:aes_128_init:avr5
+	.size aes_128_init, .-aes_128_init
+
+	.text
+.global aes_192_init
+	.type aes_192_init, @function
+aes_192_init:
+%%function-body:aes_192_init:avr5
+	.size aes_192_init, .-aes_192_init
+
+	.text
+.global aes_256_init
+	.type aes_256_init, @function
+aes_256_init:
+%%function-body:aes_256_init:avr5
+	.size aes_256_init, .-aes_256_init
+
+	.text
+.global aes_ecb_encrypt
+	.type aes_ecb_encrypt, @function
+aes_ecb_encrypt:
+%%function-body:aes_ecb_encrypt:avr5
+	.size aes_ecb_encrypt, .-aes_ecb_encrypt
+
+	.text
+.global aes_ecb_decrypt
+	.type aes_ecb_decrypt, @function
+aes_ecb_decrypt:
+%%function-body:aes_ecb_decrypt:avr5
+	.size aes_ecb_decrypt, .-aes_ecb_decrypt
+
+%%function-body:aes_sboxes:avr5
+
+%%if(lwc-finalists):#endif

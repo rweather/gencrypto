@@ -229,7 +229,15 @@ static bool generateAndTestFunction
             }
             return ok;
         } else if (!testMode) {
-            code.write(out);
+            if (code.size() != 0) {
+                code.write(out);
+            } else {
+                // No code, but there may be S-boxes to write.
+                unsigned count = code.sbox_count();
+                for (unsigned index = 0; index < count; ++index) {
+                    code.sbox_write(out, index, code.sbox_get(index));
+                }
+            }
         }
     } else if (info.generate()) {
         // TODO

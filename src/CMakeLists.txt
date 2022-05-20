@@ -15,6 +15,8 @@ add_executable(gencrypto
     avr/code_out.cpp
     avr/interpret.cpp
 
+    aes/aes-avr5.cpp
+
     ascon/ascon-avr5.cpp
     ascon/ascon-avr5-x2.cpp
     ascon/ascon-avr5-x3.cpp

@@ -16,6 +16,7 @@ function(alg_test family template)
 endfunction()
 
 # Perform all of the tests.
+alg_test(aes aes-avr5)
 alg_test(ascon ascon-avr5)
 alg_test(ascon ascon-avr5-x2)
 alg_test(ascon ascon-avr5-x3)
