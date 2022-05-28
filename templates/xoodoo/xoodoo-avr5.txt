@@ -1,0 +1,23 @@
+%%if(xoodyak-suite):#include "xoodoo-select-backend.h"
+%%if(xoodyak-suite):#if defined(XOODOO_BACKEND_AVR5)
+%%if(lwc-finalists):#if defined(__AVR__)
+%%copyright
+
+#include <avr/io.h>
+
+/*
+ * typedef struct {
+ *   uint8_t b[48]; // Bytes of the state in little-endian order.
+ * } xoodoo_state_t;
+ *
+ * void xoodoo_permute(xoodoo_state_t *state, uint8_t num_rounds);
+ */
+	.text
+.global xoodoo_permute
+	.type xoodoo_permute, @function
+xoodoo_permute:
+%%function-body:xoodoo_permute:avr5
+	.size xoodoo_permute, .-xoodoo_permute
+
+%%if(xoodyak-suite):#endif
+%%if(lwc-finalists):#endif

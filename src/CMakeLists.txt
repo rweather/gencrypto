@@ -22,4 +22,6 @@ add_executable(gencrypto
     ascon/ascon-avr5-x3.cpp
 
     sha256/sha256-avr5.cpp
+
+    xoodoo/xoodoo-avr5.cpp
 )
