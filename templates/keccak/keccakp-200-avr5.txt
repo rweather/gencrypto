@@ -1,0 +1,20 @@
+%%if(default):#if defined(__AVR__)
+%%copyright
+
+#include <avr/io.h>
+
+/*
+ * typedef struct {
+ *   uint8_t b[25]; // Bytes of the state
+ * } keccakp_200_state_t;
+ *
+ * void keccakp_200_permute(keccakp_200_state_t *state);
+ */
+	.text
+.global keccakp_200_permute
+	.type keccakp_200_permute, @function
+keccakp_200_permute:
+%%function-body:keccakp_200_permute:avr5
+	.size keccakp_200_permute, .-keccakp_200_permute
+
+%%if(default):#endif

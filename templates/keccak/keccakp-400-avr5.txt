@@ -1,0 +1,21 @@
+%%if(default):#if defined(__AVR__)
+%%copyright
+
+#include <avr/io.h>
+
+/*
+ * typedef struct {
+ *   uint8_t b[50]; // Bytes of the state in little-endian order
+ * } keccakp_400_state_t;
+ *
+ * // num_rounds should be between 1 and 20
+ * void keccakp_400_permute(keccakp_400_state_t *state, uint8_t num_rounds);
+ */
+	.text
+.global keccakp_400_permute
+	.type keccakp_400_permute, @function
+keccakp_400_permute:
+%%function-body:keccakp_400_permute:avr5
+	.size keccakp_400_permute, .-keccakp_400_permute
+
+%%if(default):#endif
