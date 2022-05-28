@@ -117,6 +117,9 @@ int main(int argc, char *argv[])
             return 1;
         }
     }
+    if (options.empty()) {
+        options.push_back("default");
+    }
 
     // Generation requires a template.  Testing also requires test vectors.
     std::ifstream templateFile;

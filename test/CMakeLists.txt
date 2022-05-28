@@ -20,6 +20,7 @@ alg_test(aes aes-avr5)
 alg_test(ascon ascon-avr5)
 alg_test(ascon ascon-avr5-x2)
 alg_test(ascon ascon-avr5-x3)
+alg_test(sha256 sha256-avr5)
 
 # Add a custom 'generate' target to generate all output files.
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../generated)

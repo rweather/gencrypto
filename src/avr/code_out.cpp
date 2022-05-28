@@ -215,7 +215,8 @@ static void Insn_write_lpm(std::ostream &ostream, const Insn &insn, bool sbox)
 {
     // Different chips within the AVR family have different "lpm" instructions.
     const char *ptr_reg = "Z";
-    if (sbox) {
+    bool inc = false;
+    if (sbox && insn.reg2() != POST_INC) {
         // Load the element that we want to look up into the low
         // byte of the Z pointer.  We assume that the table is
         // aligned on a 256-byte boundary in flash memory.
@@ -226,6 +227,7 @@ static void Insn_write_lpm(std::ostream &ostream, const Insn &insn, bool sbox)
         }
     } else if (insn.reg2() == POST_INC) {
         ptr_reg = "Z+";
+        inc = true;
     }
     ostream << "#if defined(RAMPZ)" << std::endl;
     ostream << "\telpm ";
@@ -244,6 +246,8 @@ static void Insn_write_lpm(std::ostream &ostream, const Insn &insn, bool sbox)
     ostream << ptr_reg << std::endl;
     ostream << "#else" << std::endl;
     ostream << "\tlpm" << std::endl;
+    if (inc)
+        ostream << "\tinc r30" << std::endl;
     if (insn.reg1() != 0) {
         ostream << "\tmov ";
         Insn_write_reg(ostream, insn.reg1());
@@ -253,7 +257,8 @@ static void Insn_write_lpm(std::ostream &ostream, const Insn &insn, bool sbox)
     ostream << "#endif" << std::endl;
 }
 
-static void Insn_write_lpm_setup(std::ostream &ostream, const Insn &insn)
+static void Insn_write_lpm_setup
+    (std::ostream &ostream, const Insn &insn, bool suppressLowByte = false)
 {
     // Set up the Z and RAMPZ registers with the pointer to the sbox.
     // The value() parameter of the instruction is the sbox number,
@@ -266,9 +271,11 @@ static void Insn_write_lpm_setup(std::ostream &ostream, const Insn &insn)
     // low byte of the address value will always be overwritten.  However,
     // the linker will not relocate the program address properly if we don't
     // load both the high and low bytes.  So we have no choice but to load.
-    ostream << "\tldi r30,lo8(table_";
-    ostream << table;
-    ostream << ")" << std::endl;
+    if (!suppressLowByte) {
+        ostream << "\tldi r30,lo8(table_";
+        ostream << table;
+        ostream << ")" << std::endl;
+    }
     ostream << "\tldi r31,hi8(table_";
     ostream << table;
     ostream << ")" << std::endl;
@@ -312,6 +319,17 @@ static void Insn_write_lpm_adjust(std::ostream &ostream, const Insn &insn)
 {
     ostream << "\tadd r31,";
     Insn_write_reg(ostream, insn.reg1());
+    ostream << std::endl;
+}
+
+static void Insn_write_lpm_offset(std::ostream &ostream, const Insn &insn)
+{
+    int offset = -(insn.value());
+    ostream << "\tsubi r30,";
+    ostream << (int)(offset & 0xFF);
+    ostream << std::endl;
+    ostream << "\tsbci r31,";
+    ostream << (int)((offset >> 8) & 0xFF);
     ostream << std::endl;
 }
 
@@ -362,8 +380,11 @@ void Insn::write(std::ostream &ostream, const Code &code, int offset) const
     case LDI:       Insn_write_immreg(ostream, "ldi", *this); break;
     case LPM_SBOX:  Insn_write_lpm(ostream, *this, true); break;
     case LPM_SETUP: Insn_write_lpm_setup(ostream, *this); break;
+    case LPM_SETUP2:Insn_write_lpm_setup(ostream, *this, true); break;
+    case LPM_SETLOW:Insn_write_tworeg(ostream, "mov", *this); break;
     case LPM_SWITCH:Insn_write_lpm_switch(ostream, *this); break;
     case LPM_ADJUST:Insn_write_lpm_adjust(ostream, *this); break;
+    case LPM_OFFSET:Insn_write_lpm_offset(ostream, *this); break;
     case LPM_CLEAN: Insn_write_lpm_clean(ostream); break;
     case LSL:       Insn_write_onereg(ostream, "lsl", *this); break;
     case LSR:       Insn_write_onereg(ostream, "lsr", *this); break;

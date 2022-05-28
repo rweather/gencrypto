@@ -276,11 +276,18 @@ static void exec_insn(AVRState &s, const Code &code, const Insn &insn)
         // Load immediate into register.
         s.r[insn.reg1()] = insn.value();
         break;
-    case Insn::LPM_SBOX:
+    case Insn::LPM_SBOX: {
         // Load a value from an S-box table in program memory.
-        s.r[insn.reg1()] = s.sbox.lookup(s.r[insn.reg2()] + s.sbox_offset);
-        break;
+        unsigned char reg2 = insn.reg2();
+        if (reg2 == POST_INC) {
+            s.r[insn.reg1()] = s.sbox.lookup(s.sbox_offset);
+            ++(s.sbox_offset);
+        } else {
+            s.r[insn.reg1()] = s.sbox.lookup(s.r[reg2] + s.sbox_offset);
+        }
+        break; }
     case Insn::LPM_SETUP:
+    case Insn::LPM_SETUP2:
         // Set up the S-box.
         s.sbox = code.sbox_get(insn.value());
         s.sbox_offset = 0;
@@ -292,6 +299,10 @@ static void exec_insn(AVRState &s, const Code &code, const Insn &insn)
         // errors later when we do the cleanup.
         *s.ptr_sp(PRE_DEC) = 0xBA;
         break;
+    case Insn::LPM_SETLOW:
+        // Set the low byte of the S-box pointer.
+        s.sbox_offset = s.r[insn.reg2()];
+        break;
     case Insn::LPM_SWITCH:
         // Switch to a different S-box.
         s.sbox = code.sbox_get(insn.value());
@@ -301,6 +312,10 @@ static void exec_insn(AVRState &s, const Code &code, const Insn &insn)
     case Insn::LPM_ADJUST:
         // Adjust the high byte of the S-box pointer for large S-boxes.
         s.sbox_offset = s.r[insn.reg1()] * 256;
+        break;
+    case Insn::LPM_OFFSET:
+        // Adjust the S-box pointer by an offset.
+        s.sbox_offset += insn.value();
         break;
     case Insn::LPM_CLEAN:
         // Pop the RAMPZ value, which we expect to be 0xBA.

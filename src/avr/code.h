@@ -70,8 +70,11 @@ public:
         LDI,        /**< Load immediate into register (high reg only) */
         LPM_SBOX,   /**< Load from a table in program memory with an index */
         LPM_SETUP,  /**< Set up to perform sbox lookups using "lpm" */
+        LPM_SETUP2, /**< Set up to perform sbox lookups using "lpm" */
+        LPM_SETLOW, /**< Set the low byte of the S-box pointer */
         LPM_SWITCH, /**< Switch to a different sbox */
         LPM_ADJUST, /**< Adjust the high byte of the S-box pointer */
+        LPM_OFFSET, /**< Adds an offset to the S-box pointer */
         LPM_CLEAN,  /**< Clean up after sbox lookups using "lpm" */
         LSL,        /**< Logical shift left */
         LSR,        /**< Logical shift right */
@@ -588,10 +591,13 @@ public:
 
     // S-box management.
     void sbox_setup(unsigned char num, const Sbox &sbox, const Reg &temp = Reg());
+    void sbox_setup2(unsigned char num, const Sbox &sbox, const Reg &low, const Reg &temp);
     void sbox_switch(unsigned char num, const Sbox &sbox, const Reg &temp = Reg());
     void sbox_adjust(const Reg &reg);
+    void sbox_adjust_by_offset(unsigned char offset);
     void sbox_cleanup(void);
     void sbox_lookup(const Reg &reg1, const Reg &reg2);
+    void sbox_load_inc(const Reg &reg);
     void sbox_write(std::ostream &ostream, unsigned char num, const Sbox &sbox);
     Sbox sbox_get(unsigned char num) const { return m_sboxes.at(num); }
     unsigned sbox_count() { return m_sboxes.size(); }
@@ -620,7 +626,9 @@ public:
     Reg return_value(unsigned size);
 
     // Mark pointer registers as used when not allocated by the prologue.
+    void usedX() { allocateExplicitReg(26, 2); }
     void usedY() { allocateExplicitReg(28, 2); }
+    void usedZ() { allocateExplicitReg(30, 2); }
 
     // Get an explicit register.
     Reg explicitReg(unsigned first_reg, unsigned size)

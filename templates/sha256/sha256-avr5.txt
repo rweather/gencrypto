@@ -1,0 +1,41 @@
+%%if(default):#if defined(__AVR__) && __AVR_ARCH__ >= 5
+%%if(default):#define SHA256_PARTIALLY_UNROLLED 1
+%%if(lwc-finalists):#if defined(__AVR__) && __AVR_ARCH__ >= 5
+%%if(lwc-finalists):#define SHA256_FULLY_UNROLLED 1
+%%copyright
+
+#include <avr/io.h>
+
+/*
+ * typedef struct {
+ *   uint32_t h[8];     // Hash value (words are in little-endian byte order).
+ *   uint8_t data[64];  // Input block of data.
+ * } sha256_state_t;
+ *
+ * void sha256_transform(sha256_state_t *state);
+ *
+ * Define SHA256_FULLY_UNROLLED to get a fully-unrolled version that
+ * is very large but fast.  Define SHA256_PARTIALLY_UNROLLED to get a
+ * partially unrolled version, 8 rounds at a time.  Otherwise a small
+ * but slow version will be generated.
+ */
+
+	.text
+.global sha256_transform
+	.type sha256_transform, @function
+sha256_transform:
+#if defined(SHA256_FULLY_UNROLLED)
+%%function-body:sha256_transform:full:avr5
+#elif defined(SHA256_PARTIALLY_UNROLLED)
+%%function-body:sha256_transform:partial:avr5
+#else
+%%function-body:sha256_transform:small:avr5
+#endif
+	.size sha256_transform, .-sha256_transform
+
+#if !defined(SHA256_FULLY_UNROLLED)
+%%function-body:sha256_rc_table:avr5
+#endif
+
+%%if(lwc-finalists):#endif
+%%if(default):#endif

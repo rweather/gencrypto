@@ -2014,6 +2014,29 @@ void Code::sbox_setup(unsigned char num, const Sbox &sbox, const Reg &temp)
  *
  * \param num Number of the S-box table if there is more than one.
  * \param sbox Data for the S-box table, for use by the interpreter.
+ * \param low Register that contains the low byte for the S-box pointer.
+ * \param temp Caller-provided temporary high register.
+ *
+ * This function will modify the Z and RAMPZ registers to point at the
+ * S-box table.  The previous verison of RAMPZ is pushed on the stack.
+ * The sbox_cleanup() function must be called later to restore RAMPZ
+ * from the stack before the function exits.
+ *
+ * \sa sbox_cleanup(), sbox_lookup()
+ */
+void Code::sbox_setup2
+    (unsigned char num, const Sbox &sbox, const Reg &low, const Reg &temp)
+{
+    m_insns.push_back(Insn::reg2(Insn::LPM_SETUP2, temp.reg(0), num));
+    m_insns.push_back(Insn::reg2(Insn::LPM_SETLOW, 30, low.reg(0)));
+    m_sboxes[num] = sbox;
+}
+
+/**
+ * \brief Sets up the Z register to perform S-box table lookup operations.
+ *
+ * \param num Number of the S-box table if there is more than one.
+ * \param sbox Data for the S-box table, for use by the interpreter.
  * \param temp Caller-provided temporary high register.
  *
  * This function switches directly to the new Z and RAMPZ values without
@@ -2048,6 +2071,16 @@ void Code::sbox_adjust(const Reg &reg)
 }
 
 /**
+ * \brief Adjusts the S-box pointer in the Z register by an offset.
+ *
+ * \param offset The offset to adjust by.
+ */
+void Code::sbox_adjust_by_offset(unsigned char offset)
+{
+    immreg(Insn::LPM_OFFSET, 30, offset);
+}
+
+/**
  * \brief Cleans up the RAMPZ register once S-box operations are finished.
  *
  * \sa sbox_setup(), sbox_lookup()
@@ -2075,6 +2108,17 @@ void Code::sbox_lookup(const Reg &reg1, const Reg &reg2)
         minsize = reg2.size();
     for (int index = 0; index < minsize; ++index)
         tworeg(Insn::LPM_SBOX, reg1.reg(index), reg2.reg(index));
+}
+
+/**
+ * \brief Loads a register from the current S-box and increments Z.
+ *
+ * \param reg The register to load into.
+ */
+void Code::sbox_load_inc(const Reg &reg)
+{
+    for (int index = 0; index < reg.size(); ++index)
+        immreg(Insn::LPM_SBOX, reg.reg(index), POST_INC);
 }
 
 /**

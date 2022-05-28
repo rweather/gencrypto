@@ -20,4 +20,6 @@ add_executable(gencrypto
     ascon/ascon-avr5.cpp
     ascon/ascon-avr5-x2.cpp
     ascon/ascon-avr5-x3.cpp
+
+    sha256/sha256-avr5.cpp
 )
