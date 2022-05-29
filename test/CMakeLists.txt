@@ -22,6 +22,7 @@ alg_test(ascon ascon-avr5-x2)
 alg_test(ascon ascon-avr5-x3)
 alg_test(keccak keccakp-200-avr5)
 alg_test(keccak keccakp-400-avr5)
+alg_test(keccak keccakp-1600-avr5)
 alg_test(sha256 sha256-avr5)
 alg_test(xoodoo xoodoo-avr5)
 

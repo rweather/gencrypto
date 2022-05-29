@@ -1,0 +1,20 @@
+%%if(default):#if defined(__AVR__)
+%%copyright
+
+#include <avr/io.h>
+
+/*
+ * typedef struct {
+ *   uint8_t b[200]; // Bytes of the state in little-endian order
+ * } keccakp_1600_state_t;
+ *
+ * void keccakp_1600_permute(keccakp_1600_state_t *state);
+ */
+	.text
+.global keccakp_1600_permute
+	.type keccakp_1600_permute, @function
+keccakp_1600_permute:
+%%function-body:keccakp_1600_permute:avr5
+	.size keccakp_1600_permute, .-keccakp_1600_permute
+
+%%if(default):#endif

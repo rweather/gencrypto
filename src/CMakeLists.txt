@@ -23,6 +23,7 @@ add_executable(gencrypto
 
     keccak/keccakp-200-avr5.cpp
     keccak/keccakp-400-avr5.cpp
+    keccak/keccakp-1600-avr5.cpp
 
     sha256/sha256-avr5.cpp
 
