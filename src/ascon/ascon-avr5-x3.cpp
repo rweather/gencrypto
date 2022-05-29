@@ -379,13 +379,8 @@ static void gen_avr_ascon_x3_permutation(Code &code)
 
     // The code is very large at this point.  The "rjmp" at the bottom
     // of the loop won't be able to reach back to the top.  So we create
-    // an intermediate leapfrog here to get back up to the top.
-    unsigned char label1 = 0;
-    unsigned char label2 = 0;
-    code.jmp(label2);
-    code.label(label1);
-    code.jmp(top_label);
-    code.label(label2);
+    // an intermediate "leapfrog" here to get back up to the top.
+    code.leapfrogUp(top_label);
 
     // Perform the linear diffusion layer on each of the state words.
     t0 = code.allocateReg(8);
@@ -431,7 +426,7 @@ static void gen_avr_ascon_x3_permutation(Code &code)
     // Bottom of the round loop.  Adjust the round constant and
     // check to see if we have reached the final round.
     code.sub(round, 0x0F);
-    code.compare_and_loop(round, 0x3C, label1);
+    code.compare_and_loop(round, 0x3C, top_label);
 
     // Transfer x2.c, x3, and x4 from local variables back to the state.
     t0 = code.allocateReg(8);

@@ -160,19 +160,26 @@ static void Insn_write_br
     int target = code.getLabel(insn.label());
     bool forward = true;
     bool long_jump = false;
+    bool large_jump = false;
     if (target > offset) {
         if ((target - (offset + 1)) > 50)
             long_jump = true;
+        if ((target - (offset + 1)) > 2040)
+            large_jump = true;
     } else {
         if (((offset + 1) - target) > 50)
             long_jump = true;
+        if (((offset + 1) - target) > 2040)
+            large_jump = true;
         forward = false;
+    }
+    if (large_jump) {
+        throw std::invalid_argument("relative branch is too large");
     }
     if (long_jump && insn.type() != Insn::JMP && insn.type() != Insn::CALL) {
         // We need to jump a long way, so output the reverse branch as a
         // skip and then perform an "rjmp" instruction to jump to where
-        // we really want to go.  We assume that the function we are assembling
-        // is smaller than 4K in size so that "rjmp" can reach any location.
+        // we really want to go.
         ostream << "\t";
         ostream << namerev;
         ostream << " ";

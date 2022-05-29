@@ -126,8 +126,7 @@ static void gen_avr_keccakp_1600_permutation(Code &code)
         code.ldz(A00, posn_A(0, 0));
         code.logxor(A00, RC[round]);
     }
-    unsigned char leapfrog = 0;
-    code.jmp(leapfrog);
+    code.jmp(end_label);
 
     // Step mapping theta.
     //      for i in 0..4:
@@ -167,12 +166,7 @@ static void gen_avr_keccakp_1600_permutation(Code &code)
     }
 
     // Place a leapfrog here to help jmp(end_label) reach the end.
-    unsigned char skip = 0;
-    code.jmp(skip);
-    code.label(leapfrog);
-    unsigned char leapfrog2 = 0;
-    code.jmp(leapfrog2);
-    code.label(skip);
+    code.leapfrogDown(end_label);
 
     // Step mappings rho and pi combined into a single step.
     adjust_z_offset(code, z_offset, posn_A(0, 0));
@@ -207,11 +201,7 @@ static void gen_avr_keccakp_1600_permutation(Code &code)
     code.releaseReg(C);
 
     // Place a leapfrog here to help jmp(end_label) reach the end.
-    unsigned char skip2 = 0;
-    code.jmp(skip2);
-    code.label(leapfrog2);
-    code.jmp(end_label);
-    code.label(skip2);
+    code.leapfrogDown(end_label);
 
     // Step mapping chi.
     //

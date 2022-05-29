@@ -85,6 +85,8 @@ struct AVRState
         *ptr_sp(PRE_DEC) = (unsigned char)(value >> 8);
         *ptr_sp(PRE_DEC) = (unsigned char)value;
     }
+
+    void setPC(int newPC);
 };
 
 unsigned char *AVRState::ptr(int reg, unsigned char offset)
@@ -121,6 +123,16 @@ unsigned AVRState::alloc_buffer(const void *data, unsigned len)
     unsigned result = alloc_buffer(len);
     memcpy(&(memory[result]), data, len);
     return result;
+}
+
+// Sets the program counter to a new value.
+void AVRState::setPC(int newPC)
+{
+    if ((pc < newPC && (newPC - pc) > 2000) ||
+            (pc > newPC && (pc - newPC) > 2000)) {
+        throw std::invalid_argument("relative branch is too large");
+    }
+    pc = newPC;
 }
 
 // Executes a single instruction.
@@ -186,27 +198,27 @@ static void exec_insn(AVRState &s, const Code &code, const Insn &insn)
     case Insn::BRCC:
         // Branch if carry clear.
         if (!s.c)
-            s.pc = code.getLabel(insn.label());
+            s.setPC(code.getLabel(insn.label()));
         break;
     case Insn::BRCS:
         // Branch if carry set.
         if (s.c)
-            s.pc = code.getLabel(insn.label());
+            s.setPC(code.getLabel(insn.label()));
         break;
     case Insn::BREQ:
         // Branch if equal / zero.
         if (s.z)
-            s.pc = code.getLabel(insn.label());
+            s.setPC(code.getLabel(insn.label()));
         break;
     case Insn::BRNE:
         // Branch if not equal.
         if (!s.z)
-            s.pc = code.getLabel(insn.label());
+            s.setPC(code.getLabel(insn.label()));
         break;
     case Insn::CALL:
         // Call a local subroutine.
         s.push16(s.pc);
-        s.pc = code.getLabel(insn.label());
+        s.setPC(code.getLabel(insn.label()));
         break;
     case Insn::COM:
         // NOT a register.
@@ -255,7 +267,7 @@ static void exec_insn(AVRState &s, const Code &code, const Insn &insn)
         break;
     case Insn::JMP:
         // Unconditional jump to a label.
-        s.pc = code.getLabel(insn.label());
+        s.setPC(code.getLabel(insn.label()));
         break;
     case Insn::LABEL:
         // Label - nothing to do.

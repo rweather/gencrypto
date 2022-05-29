@@ -760,6 +760,53 @@ void Code::compare_and_set
 }
 
 /**
+ * \brief Establish a "leapfrog" at this location that extends the
+ * range of a previous "jmp" instruction.
+ *
+ * \param jmpLabel The label that the previous "jmp" instruction referenced.
+ * \param withSkip True to skip over the leapfrog, false if skip not needed.
+ */
+void Code::leapfrogDown(unsigned char &jmpLabel, bool withSkip)
+{
+    unsigned char skip = 0;
+    if (withSkip) {
+        jmp(skip);
+        label(jmpLabel);
+        jmpLabel = 0;
+        jmp(jmpLabel);
+        label(skip);
+    } else {
+        label(jmpLabel);
+        jmpLabel = 0;
+        jmp(jmpLabel);
+    }
+}
+
+/**
+ * \brief Establish a "leapfrog" at this location that extends the
+ * range of a later branch instruction.
+ *
+ * \param jmpLabel The label that the later "jmp" instruction will reference.
+ * \param withSkip True to skip over the leapfrog, false if skip not needed.
+ */
+void Code::leapfrogUp(unsigned char &jmpLabel, bool withSkip)
+{
+    unsigned char skip = 0;
+    unsigned char jmpup = 0;
+    if (withSkip) {
+        jmp(skip);
+        label(jmpup);
+        jmp(jmpLabel);
+        jmpLabel = jmpup;
+        label(skip);
+    } else {
+        label(jmpup);
+        jmp(jmpLabel);
+        jmpLabel = jmpup;
+    }
+}
+
+/**
  * \brief Shifts the contents of a register left by a number of bits.
  *
  * \param reg The register to shift.

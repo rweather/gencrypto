@@ -538,6 +538,8 @@ public:
     void ldy_xor_in(const Reg &reg, unsigned offset) { ld_xor_in(reg, Insn::LD_Y, offset); }
     void ldlocal_xor_in(const Reg &reg, unsigned offset) { ld_xor_in(reg, Insn::LD_Y, offset + 1); }
     void ldz_xor_in(const Reg &reg, unsigned offset) { ld_xor_in(reg, Insn::LD_Z, offset); }
+    void leapfrogDown(unsigned char &jmpLabel, bool withSkip = true);
+    void leapfrogUp(unsigned char &jmpLabel, bool withSkip = true);
     void lsl(const Reg &reg, unsigned bits);
     void lsl_bytes(const Reg &reg, unsigned count);
     void lsr(const Reg &reg, unsigned bits);

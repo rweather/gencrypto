@@ -487,6 +487,10 @@ static void gen_sha256_transform_partially_unrolled(Code &code)
     }
     code.ret();
 
+    // Add a "leapfrog" here so that the previous jmp(end_label)
+    // is able to reach to the end of the function.
+    code.leapfrogDown(end_label, false);
+
     // Derive the state words for the next 16 rounds.
     code.label(derive_label);
     for (index = 16; index < 32; ++index)
