@@ -2,11 +2,20 @@
 enable_testing()
 
 add_executable(gencrypto
+    common/codegen.cpp
     common/codegen.h
     common/copyright.h
+    common/insns.cpp
+    common/insns.h
     common/main.cpp
+    common/platform.cpp
+    common/platform.h
+    common/platform_arm.cpp
+    common/platform_arm.h
     common/registry.cpp
     common/registry.h
+    common/regs.cpp
+    common/regs.h
     common/testvector.cpp
     common/testvector.h
 
