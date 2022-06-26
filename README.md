@@ -1,6 +1,9 @@
 gencrypto
 =========
 
+**Note: The 32-bit and 64-bit parts of the framework are still a work in
+progress.  The AVR parts of the framework are mature.**
+
 The "gencrypto" tool is a "guided compiler" that provides a framework
 for generating and testing high performance assembly code versions of
 cryptography primitives.
