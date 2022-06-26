@@ -26,36 +26,13 @@
 
 using namespace AVR;
 
-static void shift_left_4regs
-    (Code &code, unsigned char r0, unsigned char r1,
-     unsigned char r2, unsigned char r3)
-{
-    code.onereg(Insn::LSL, r0);
-    code.onereg(Insn::ROL, r1);
-    code.onereg(Insn::ROL, r2);
-    code.onereg(Insn::ROL, r3);
-}
-
-static void shift_left_5regs
-    (Code &code, unsigned char r0, unsigned char r1,
-     unsigned char r2, unsigned char r3, unsigned char r4)
-{
-    code.onereg(Insn::LSL, r0);
-    code.onereg(Insn::ROL, r1);
-    code.onereg(Insn::ROL, r2);
-    code.onereg(Insn::ROL, r3);
-    code.onereg(Insn::ROL, r4);
-}
-
 static void gen_tinyjambu_steps_32
     (Code &code, const Reg &s0, const Reg &s1, const Reg &s2, const Reg &s3,
      int koffset)
 {
     // Allocate some temporary working registers.  After the allocations
-    // in the gen_tinyjambu_permutation() function we have 7 left spare.
-    Reg temp = code.allocateReg(7);
-    Reg t = Reg(temp, 0, 4);
-    Reg u = Reg(temp, 4, 3);
+    // in the gen_tinyjambu_permutation() function we have 9 left spare.
+    Reg temp = code.allocateReg(9);
 
     // t1 = (s1 >> 15) | (s2 << 17);
     // s0 ^= t1;
@@ -69,25 +46,16 @@ static void gen_tinyjambu_steps_32
     // t3 = (s2 >> 21) | (s3 << 11);
     // s0 ^= ~(t2 & t3);
     // Note: We assume that the key is inverted so we can avoid the NOT.
-    code.move(Reg(t, 0, 3), Reg(s2, 1, 3));
-    code.move(Reg(t, 3, 1), Reg(s3, 0, 1));
-    code.tworeg(Insn::MOV, TEMP_REG, s2.reg(0));
-    shift_left_5regs(code, TEMP_REG, t.reg(0), t.reg(1), t.reg(2), t.reg(3));
-    shift_left_5regs(code, TEMP_REG, t.reg(0), t.reg(1), t.reg(2), t.reg(3));
-    // Getting low on registers, so divide t3 into two parts,
-    // then AND the parts into t2 one at a time.
-    code.move(Reg(u, 0, 1), Reg(s2, 3, 1));
-    code.tworeg(Insn::MOV, TEMP_REG, s2.reg(2));
-    code.move(Reg(u, 1, 2), Reg(s3, 0, 2));
-    shift_left_4regs(code, TEMP_REG, u.reg(0), u.reg(1), u.reg(2));
-    shift_left_4regs(code, TEMP_REG, u.reg(0), u.reg(1), u.reg(2));
-    shift_left_4regs(code, TEMP_REG, u.reg(0), u.reg(1), u.reg(2));
-    code.logand(Reg(t, 0, 3), u);
-    code.move(Reg(u, 0, 2), Reg(s3, 1, 2));
-    code.lsl(Reg(u, 0, 2), 3);
-    code.logand(Reg(t, 3, 1), Reg(u, 1, 1));
-    // code.lognot(t); -- avoided
-    code.logxor(s0, t);
+    code.move(Reg(temp, 4, 4), s2);
+    code.move(Reg(temp, 8, 1), s3);
+    code.lsl(Reg(temp, 4, 5), 2);
+    Reg t2 = Reg(temp, 5, 4);
+    code.move(Reg(temp, 0, 2), Reg(s2, 2, 2));
+    code.move(Reg(temp, 2, 3), Reg(s3, 0, 3));
+    code.lsl(Reg(temp, 0, 5), 3);
+    Reg t3 = Reg(temp, 1, 4);
+    code.logand(t2, t3);
+    code.logxor(s0, t2);
 
     // t4 = (s2 >> 27) | (s3 << 5);
     // s0 ^= t4;
