@@ -1,0 +1,21 @@
+
+Function = tinyjambu_permutation_128
+
+Name = TinyJAMBU-28
+Input = 000102030405060708090a0b0c0d0e0f
+Key = 00112233445566778899aabbccddeeff
+Output = 755b02d911c7a7de5cfe2bc416501e36
+
+Function = tinyjambu_permutation_192
+
+Name = TinyJAMBU-192
+Input = 000102030405060708090a0b0c0d0e0f
+Key = 00112233445566778899aabbccddeeffa5b48796e1f0c3d2
+Output = dad403eb424389144dbad7b0a6535b02
+
+Function = tinyjambu_permutation_256
+
+Name = TinyJAMBU-256
+Input = 000102030405060708090a0b0c0d0e0f
+Key = 00112233445566778899aabbccddeeffa5b48796e1f0c3d22d3c0f1e69784b5a
+Output = 53f266f0ed13cfa8b92e6fd44a5e4cbd

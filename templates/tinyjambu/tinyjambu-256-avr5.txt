@@ -1,0 +1,25 @@
+%%if(tinyjambu-suite):#include "tinyjambu-backend-select.h"
+%%if(tinyjambu-suite):#if defined(TINYJAMBU_BACKEND_AVR5)
+%%if(lwc-finalists):#if defined(__AVR__)
+%%copyright
+
+#include <avr/io.h>
+
+/*
+ * typedef struct {
+ *   uint32_t s[4]; // Words of the state in little-endian order.
+ *   uint32_t k[8]; // Words of the key in little-endian order.
+ * } tinyjambu_256_state_t;
+ *
+ * void tinyjambu_permutation_256
+ *      (tinyjambu_256_state_t *state, unsigned rounds);
+ */
+	.text
+.global tinyjambu_permutation_256
+	.type tinyjambu_permutation_256, @function
+tinyjambu_permutation_256:
+%%function-body:tinyjambu_permutation_256:avr5
+	.size tinyjambu_permutation_256, .-tinyjambu_permutation_256
+
+%%if(tinyjambu-suite):#endif
+%%if(lwc-finalists):#endif

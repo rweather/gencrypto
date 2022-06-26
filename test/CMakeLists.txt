@@ -24,6 +24,9 @@ alg_test(keccak keccakp-200-avr5)
 alg_test(keccak keccakp-400-avr5)
 alg_test(keccak keccakp-1600-avr5)
 alg_test(sha256 sha256-avr5)
+alg_test(tinyjambu tinyjambu-128-avr5)
+alg_test(tinyjambu tinyjambu-192-avr5)
+alg_test(tinyjambu tinyjambu-256-avr5)
 alg_test(xoodoo xoodoo-avr5)
 
 # Add a custom 'generate' target to generate all output files.

@@ -36,5 +36,7 @@ add_executable(gencrypto
 
     sha256/sha256-avr5.cpp
 
+    tinyjambu/tinyjambu-avr5.cpp
+
     xoodoo/xoodoo-avr5.cpp
 )
